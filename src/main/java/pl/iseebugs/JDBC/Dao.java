@@ -1,11 +1,12 @@
 package pl.iseebugs.JDBC;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface Dao<T,K> {
-    List<T> read();
-    T readById(K id);
-    T create(T entity);
-    T update(T entity);
-    T delete(T entity);
+public interface Dao<T> {
+    List<T> readAll();
+    Optional<T> read(int id);
+    T create(T t);
+    T update(T t);
+    T delete(T t);
 }

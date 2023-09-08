@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class UserDal {
+public class DataAccessLayer {
 
     public static ResultSet executeSelect(String selectQuery){
 

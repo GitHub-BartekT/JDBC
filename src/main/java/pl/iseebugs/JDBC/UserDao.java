@@ -4,19 +4,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-public class UserDao implements UserDaoImpl{
+public class UserDao implements Dao<User> {
 
     public UserDao() {
     }
 
     @Override
-    public List<User> read() {
+    public List<User> readAll() {
         List<User> userList = new ArrayList<>();
 
         try {
             String read = "SELECT \"USER_ID\", \"USER_NAME\", \"USER_ROLE\" FROM public.users";
-            ResultSet result = UserDal.executeSelect(read);
+            ResultSet result = DataAccessLayer.executeSelect(read);
             while (result.next()) {
                 User user = new User();
                 user.setUserId(result.getInt("USER_ID"));
@@ -32,11 +33,11 @@ public class UserDao implements UserDaoImpl{
     }
 
     @Override
-    public User readById(Integer id) {
+    public Optional<User> read(int id) {
         User user = new User();
         try{
             String readById = String.format("SELECT * FROM public.users WHERE \"USER_ID\" = '%s'", id);
-            ResultSet result = UserDal.executeSelect(readById);
+            ResultSet result = DataAccessLayer.executeSelect(readById);
             while (result.next()) {
                 user.setUserId(result.getInt("USER_ID"));
                 user.setUserName(result.getString("USER_NAME"));
@@ -45,24 +46,7 @@ public class UserDao implements UserDaoImpl{
         } catch (SQLException e){
             e.printStackTrace();
         }
-        return user;
-    }
-
-    @Override
-    public User readByName(String name) {
-        User user = new User();
-        try{
-            String readByName = String.format("SELECT * FROM public.users WHERE \"USER_NAME\" = '%s'", name);
-            ResultSet result = UserDal.executeSelect(readByName);
-            while (result.next()) {
-                user.setUserId(result.getInt("USER_ID"));
-                user.setUserName(result.getString("USER_NAME"));
-                user.setUserRole(result.getString("USER_ROLE"));
-            }
-        } catch (SQLException e){
-            e.printStackTrace();
-        }
-        return user;
+        return Optional.ofNullable(user);
     }
 
     @Override
@@ -74,7 +58,7 @@ public class UserDao implements UserDaoImpl{
 
         String createUser = String.format("INSERT INTO public.users (\"USER_NAME\", \"USER_ROLE\") VALUES ('%s', '%s')",
                 entity.getUserName(),entity.getUserRole());
-        UserDal.executeQuery(createUser);
+        DataAccessLayer.executeQuery(createUser);
         return entity;
     }
 
@@ -82,7 +66,7 @@ public class UserDao implements UserDaoImpl{
     public User update(User entity) {
         String updateUser = String.format("UPDATE public.users SET \"USER_ROLE\"='%s' WHERE \"USER_NAME\"='%s'",
                 entity.getUserRole(), entity.getUserName());
-        UserDal.executeQuery(updateUser);
+        DataAccessLayer.executeQuery(updateUser);
         return entity;
     }
 
@@ -90,7 +74,23 @@ public class UserDao implements UserDaoImpl{
     public User delete(User entity) {
         String deleteUser = String.format("DELETE FROM public.users WHERE \"USER_NAME\"='%s'",
                 entity.getUserName());
-        UserDal.executeQuery(deleteUser);
+        DataAccessLayer.executeQuery(deleteUser);
         return null;
+    }
+
+    public User readByName(String name) {
+        User user = new User();
+        try{
+            String readByName = String.format("SELECT * FROM public.users WHERE \"USER_NAME\" = '%s'", name);
+            ResultSet result = DataAccessLayer.executeSelect(readByName);
+            while (result.next()) {
+                user.setUserId(result.getInt("USER_ID"));
+                user.setUserName(result.getString("USER_NAME"));
+                user.setUserRole(result.getString("USER_ROLE"));
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return user;
     }
 }
